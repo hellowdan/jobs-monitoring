@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobsDailyStatusService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobsDailyStatusService.class);
-
     @Autowired
     JobsDailyStatusRepository jobsDailyStatusRepository;
 
@@ -48,7 +46,6 @@ public class JobsDailyStatusService {
                 setResult("SUCCESS");
             } catch (IOException e) {
                 setResult(e.toString());
-                LOGGER.debug(String.format(ExceptionsConstants.FAILED_SAVING_TO_DATABASE, jobsDailyStatusRepository.getClass().getCanonicalName()), e);
             }
         });
 
