@@ -44,8 +44,8 @@ public class JobsDailyStatusService {
                     JobsDailyStatusData jobsDailyStatusData = new JobsDailyStatusData(j);
                     JobsDailyStatusEntity jobsDailyStatusEntity = jobsDailyStatusData.getStatusData();
                     jobsDailyStatusRepository.save(jobsDailyStatusEntity);
+                    setResult("SUCCESS");
                 }
-                setResult("SUCCESS");
             } catch (IOException e) {
                 setResult(e.toString());
             }
