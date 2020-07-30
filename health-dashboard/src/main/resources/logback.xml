@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <timestamp key="byDay" datePattern="yyyyMMdd'T'HHmmss"/>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Pattern>
+    </layout>
+  </appender>
+
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>/home/drosa/Documents/Workspace/performance-reports/logs/performance-reports-log-test-${byDay}.log</file>
+    <append>true</append>
+    <encoder>
+      <pattern>%d %p %c{1.} [%t] %m%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="error">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+
+  <root level="debug">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE" />
+  </root>
+
+</configuration>
