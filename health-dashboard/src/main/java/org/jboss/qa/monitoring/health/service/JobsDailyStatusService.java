@@ -40,9 +40,11 @@ public class JobsDailyStatusService {
 
         jobsEntities.forEach(j -> {
             try {
-                JobsDailyStatusData jobsDailyStatusData = new JobsDailyStatusData(j);
-                JobsDailyStatusEntity jobsDailyStatusEntity = jobsDailyStatusData.getStatusData();
-                jobsDailyStatusRepository.save(jobsDailyStatusEntity);
+                if(j.getActive() > 0) {
+                    JobsDailyStatusData jobsDailyStatusData = new JobsDailyStatusData(j);
+                    JobsDailyStatusEntity jobsDailyStatusEntity = jobsDailyStatusData.getStatusData();
+                    jobsDailyStatusRepository.save(jobsDailyStatusEntity);
+                }
                 setResult("SUCCESS");
             } catch (IOException e) {
                 setResult(e.toString());

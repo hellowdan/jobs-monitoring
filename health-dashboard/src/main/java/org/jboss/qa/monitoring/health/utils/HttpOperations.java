@@ -37,7 +37,6 @@ public class HttpOperations {
 
     public static Reader getFileReaderFromWeb(String url) throws IOException {
         Reader input = null;
-        System.out.println("getFileReaderFromWeb");
 
         try {
             URL urlFile = new URL(url);
@@ -55,7 +54,7 @@ public class HttpOperations {
 
     private static Reader getFileReaderFromHTTPS(URL url) throws IOException {
         Reader input;
-        System.out.println("getFileReaderFromHTTPS-Reader");
+        System.out.println("getFileReaderFromHTTPS-Reader - "+url.toString());
 
         try {
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
@@ -70,7 +69,7 @@ public class HttpOperations {
 
     private static Reader getFileReaderFromHTTP(URL url) throws IOException {
         Reader input;
-        System.out.println("getFileReaderFromHTTP-Reader");
+        System.out.println("getFileReaderFromHTTP-Reader - "+url.toString());
 
         try {
             URLConnection urlConn = url.openConnection();
