@@ -1,13 +1,11 @@
 package org.jboss.qa.monitoring.health.data;
 
-import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.LinkedHashMap;
 
-import org.jboss.qa.monitoring.health.definitions.SourceFileLocation;
 import org.jboss.qa.monitoring.health.definitions.SourceStatusColumns;
 import org.jboss.qa.monitoring.health.model.JobsDailyStatusEntity;
 import org.jboss.qa.monitoring.health.model.JobsEntity;
-import org.jboss.qa.monitoring.health.utils.JsonLoader;
 import org.json.simple.JSONObject;
 
 public class JobsDailyStatusData {
@@ -18,11 +16,7 @@ public class JobsDailyStatusData {
         this.jobsEntity = jobsEntity;
     }
 
-    public JobsDailyStatusEntity getStatusData() throws IOException {
-        JsonLoader jsonLoader = new JsonLoader();
-        JSONObject dataJsonLastBuild = jsonLoader.getDataFromJsonObject(this.jobsEntity.getLastBuildApiUrl(), SourceFileLocation.WEB);
-        JSONObject dataJsonJob = jsonLoader.getDataFromJsonObject(this.jobsEntity.getApiUrl(), SourceFileLocation.WEB);
-
+    public JobsDailyStatusEntity getParsedStatusData(JSONObject dataJsonLastBuild, JSONObject dataJsonJob){
         JobsDailyStatusRow jobsDailyStatusRow = parseJenkinsStatus(dataJsonLastBuild, dataJsonJob);
 
         JobsDailyStatusEntity jobsDailyStatusEntity = new JobsDailyStatusEntity(jobsDailyStatusRow, this.jobsEntity);
@@ -37,18 +31,18 @@ public class JobsDailyStatusData {
             jobsDailyStatusRow.setUrl(dataJsonLastBuild.get(SourceStatusColumns.URL.getColumn()).toString());
         }
         if (dataJsonJob.get(SourceStatusColumns.LAST_BUILD.getColumn()) != null) {
-            JSONObject resultsObject = (JSONObject) dataJsonJob.get(SourceStatusColumns.LAST_BUILD.getColumn());
-            String number = resultsObject.get(SourceStatusColumns.BUILD_NUMBER.getColumn()).toString();
+            LinkedHashMap lastBuild = (LinkedHashMap) dataJsonJob.get(SourceStatusColumns.LAST_BUILD.getColumn());
+            String number = lastBuild.get(SourceStatusColumns.BUILD_NUMBER.getColumn()).toString();
             jobsDailyStatusRow.setLastBuild(number);
         }
         if (dataJsonJob.get(SourceStatusColumns.LAST_SUCCESSFUL_BUILD.getColumn()) != null) {
-            JSONObject resultsObject = (JSONObject) dataJsonJob.get(SourceStatusColumns.LAST_SUCCESSFUL_BUILD.getColumn());
-            String number = resultsObject.get(SourceStatusColumns.BUILD_NUMBER.getColumn()).toString();
+            LinkedHashMap lastSucessfulBuild = (LinkedHashMap) dataJsonJob.get(SourceStatusColumns.LAST_SUCCESSFUL_BUILD.getColumn());
+            String number = lastSucessfulBuild.get(SourceStatusColumns.BUILD_NUMBER.getColumn()).toString();
             jobsDailyStatusRow.setLastSuccessfulBuild(number);
         }
         if (dataJsonJob.get(SourceStatusColumns.LAST_FAILED_BUILD.getColumn()) != null) {
-            JSONObject resultsObject = (JSONObject) dataJsonJob.get(SourceStatusColumns.LAST_FAILED_BUILD.getColumn());
-            String number = resultsObject.get(SourceStatusColumns.BUILD_NUMBER.getColumn()).toString();
+            LinkedHashMap lastFailedBuild = (LinkedHashMap) dataJsonJob.get(SourceStatusColumns.LAST_FAILED_BUILD.getColumn());
+            String number = lastFailedBuild.get(SourceStatusColumns.BUILD_NUMBER.getColumn()).toString();
             jobsDailyStatusRow.setLastFailedBuild(number);
         }
         if (dataJsonLastBuild.get(SourceStatusColumns.LAST_BUILD_STATUS.getColumn()) != null) {

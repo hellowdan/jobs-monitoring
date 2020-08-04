@@ -1,17 +1,16 @@
 package org.jboss.qa.monitoring.health.service;
 
-import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.jboss.qa.monitoring.health.dao.JobsDailyStatusRepository;
 import org.jboss.qa.monitoring.health.data.JobsDailyStatusData;
-import org.jboss.qa.monitoring.health.exceptions.ExceptionsConstants;
 import org.jboss.qa.monitoring.health.model.JobsDailyStatusEntity;
 import org.jboss.qa.monitoring.health.model.JobsEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class JobsDailyStatusService {
@@ -22,36 +21,32 @@ public class JobsDailyStatusService {
     @Autowired
     JobsService jobsService;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     private List<JobsEntity> jobsEntities;
 
-    private String result = "";
-
-    private void setResult(String result) {
-        this.result = result;
-    }
-
-    private String getResult(){
-        return this.result;
-    }
-
-    public String runStatus(){
+    public String runStatus() {
         this.jobsEntities = jobsService.getAllJobs();
-        setResult("FAIL");
 
+        try {
         jobsEntities.forEach(j -> {
-            try {
-                if(j.getActive() > 0) {
-                    JobsDailyStatusData jobsDailyStatusData = new JobsDailyStatusData(j);
-                    JobsDailyStatusEntity jobsDailyStatusEntity = jobsDailyStatusData.getStatusData();
-                    jobsDailyStatusRepository.save(jobsDailyStatusEntity);
-                    setResult("SUCCESS");
-                }
-            } catch (IOException e) {
-                setResult(e.toString());
+            if (j.getActive() > 0) {
+                JSONObject dataJsonLastBuild = getJsonContentFromHTTPS(j.getLastBuildApiUrl());
+                JSONObject dataJsonJob = getJsonContentFromHTTPS(j.getApiUrl());
+
+                JobsDailyStatusData jobsDailyStatusData = new JobsDailyStatusData(j);
+                JobsDailyStatusEntity jobsDailyStatusEntity = jobsDailyStatusData.getParsedStatusData(dataJsonLastBuild, dataJsonJob);
+                jobsDailyStatusRepository.save(jobsDailyStatusEntity);
             }
         });
-
-        return getResult();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+        return "SUCCESS";
     }
 
+    public JSONObject getJsonContentFromHTTPS(String url) {
+        return this.restTemplate.getForObject(url, JSONObject.class);
+    }
 }
